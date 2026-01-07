@@ -1,33 +1,113 @@
-# LDA Topik Modeling Berita Indonesia
+# Analisis Tren Topik Pemberitaan Nasional Berbasis Data Teks
 
-Proyek ini bertujuan untuk melakukan analisis topik otomatis terhadap kumpulan judul berita berbahasa Indonesia menggunakan algoritma Latent Dirichlet Allocation (LDA). Pipeline ini mencakup preprocessing teks, pembentukan n-gram, evaluasi topic coherence, dan visualisasi hasil dalam bentuk wordcloud per topik serta perceptual map.
+## Latar Belakang Masalah
+Pemberitaan media daring menghasilkan data teks dalam jumlah besar
+yang sulit dianalisis secara manual. Tanpa analisis terstruktur,
+pola isu dominan dan perubahan topik dalam periode tertentu
+sering kali tidak teridentifikasi secara sistematis.
 
-## Alur Analisis
+Proyek ini bertujuan untuk menganalisis tren topik pada judul berita
+berbahasa Indonesia menggunakan pendekatan *topic modeling*,
+guna memperoleh insight mengenai isu-isu utama yang muncul
+dalam periode waktu tertentu.
 
-1. Input Data  
-   Format: Excel (`.xlsx`) — kolom utama: `title`
+---
 
-2. Preprocessing
-   - Case folding
-   - Stopword removal (Sastrawi + stopwords manual)
-   - Tokenisasi
+## Data
+- **Sumber:** Judul berita dari kanal **detikNews**
+- **Rentang waktu:** 16 Desember 2021 – 24 Maret 2022
+- **Jumlah data:** 1.980 judul berita
+- **Format:** Excel (`.xlsx`)
+- **Variabel utama:** `title` (judul berita)
 
-3. Bigram & Trigram  
-   Menggabungkan frasa populer seperti `korupsi_anggaran`, `bantuan_sosial`.
+Data ini merepresentasikan kecenderungan isu nasional
+yang muncul dalam pemberitaan media daring.
 
-4. Vectorization  
-   Menggunakan CountVectorizer untuk menghasilkan dokumen-term matrix.
+---
 
-5. Topic Modeling (LDA)  
-   Pemilihan jumlah topik terbaik berdasarkan coherence score (c_v).
+## Pendekatan Analisis
 
-6. Visualisasi
-   - Wordcloud per topik
-   - Perceptual Map (PCA 2D scatter)
-   - Visualisasi interaktif menggunakan pyLDAvis
+### 1. Pra-pemrosesan Teks
+- Case folding
+- Penghapusan angka dan tanda baca
+- Stopword removal (Sastrawi + daftar khusus)
+- Tokenisasi dan pembentukan n-gram (bigram & trigram)
 
-## Struktur Folder
+Tahap ini bertujuan untuk meningkatkan kualitas representasi teks
+sebelum dilakukan pemodelan topik.
 
+### 2. Pembentukan Representasi Dokumen
+- Vectorisasi teks menggunakan **CountVectorizer**
+- Pembentukan dokumen–term matrix sebagai input model
+
+### 3. Topic Modeling
+- Penerapan **Latent Dirichlet Allocation (LDA)**
+  untuk mengidentifikasi kelompok topik laten
+- Pemilihan jumlah topik optimal berdasarkan
+  **coherence score (c_v)**
+
+### 4. Visualisasi dan Interpretasi
+- Wordcloud untuk interpretasi kata kunci tiap topik
+- Perceptual map (PCA 2D) untuk melihat kedekatan antar topik
+- Visualisasi interaktif menggunakan **pyLDAvis**
+
+---
+
+## Hasil Analisis
+- Model berhasil mengelompokkan judul berita ke dalam
+  beberapa topik utama yang merepresentasikan isu nasional.
+- Setiap topik ditandai oleh kumpulan kata kunci dominan
+  yang memudahkan interpretasi konteks pemberitaan.
+- Visualisasi PCA menunjukkan pemisahan topik yang cukup jelas,
+  menandakan konsistensi struktur topik dalam data.
+
+---
+
+## Insight Utama
+- Pemberitaan nasional menunjukkan konsentrasi pada
+  beberapa isu utama yang muncul secara konsisten
+  dalam periode pengamatan.
+- Analisis topik membantu mereduksi kompleksitas data teks
+  menjadi ringkasan isu yang mudah dipahami.
+- Pendekatan ini dapat digunakan sebagai dasar
+  pemantauan tren menunjukkan fokus media
+  terhadap isu tertentu.
+
+---
+
+## Potensi Pemanfaatan
+- **Analisis Media:**  
+  Mengidentifikasi isu dominan dan pola framing media daring.
+- **Pemantauan Isu Publik:**  
+  Mendukung analisis tren kebijakan, politik, atau sosial
+  berbasis data teks.
+- **Data-driven Reporting:**  
+  Sebagai dasar pembuatan laporan ringkasan isu secara otomatis.
+
+---
+
+## Visualisasi
+- Wordcloud per topik tersedia pada:
+  `figures/wordclouds_per_topic/`
+- Distribusi topik:
+  `figures/lda_topic_distribution.png`
+- Visualisasi interaktif:
+  `figures/pyldavis_lda.html`
+
+---
+
+## Tools & Library
+- Python, Pandas
+- Scikit-learn
+- Gensim
+- Sastrawi
+- WordCloud
+- Matplotlib
+- pyLDAvis
+
+---
+
+## Struktur Proyek
 ```
 lda-berita/
 ├── data/
@@ -37,9 +117,6 @@ lda-berita/
 │   ├── lda_topic_distribution.png
 │   ├── pyldavis_lda.html
 │   └── wordclouds_per_topic/
-│       ├── wordcloud_topic_1.png
-│       ├── wordcloud_topic_2.png
-│       └── ...
 ├── src/
 │   ├── preprocessing.py
 │   ├── ngram.py
@@ -50,65 +127,6 @@ lda-berita/
 └── requirements.txt
 ```
 
-## Cara Menjalankan
+## Penulis
 
-```bash
-# 1. Buat dan aktifkan virtual environment
-python3 -m venv env
-source env/bin/activate
-
-# 2. Install dependensi
-pip install -r requirements.txt
-
-# 3. Jalankan analisis
-python main.py
-```
-
-## Dependensi Utama
-
-- pandas
-- matplotlib
-- scikit-learn
-- wordcloud
-- gensim
-- Sastrawi
-- pyLDAvis
-
-### Deskripsi Dataset
-
-Dataset yang digunakan dalam proyek ini terdiri dari kumpulan **judul berita berbahasa Indonesia** yang diperoleh dari kanal **detikNews** di situs [https://news.detik.com](https://news.detik.com).
-
-- **Populasi**: Semua judul berita pada kanal detikNews
-- **Sumber data**: [https://news.detik.com](https://news.detik.com)
-- **Rentang waktu pengambilan data**: 16 Desember 2021 hingga 24 Maret 2022
-- **Jumlah data**: 1980 judul berita
-- **Format data**: Excel (`.xlsx`) dengan satu kolom utama yaitu `title` yang berisi judul berita
-
-Tujuan pengumpulan data ini adalah untuk menganalisis kecenderungan topik yang muncul dalam periode waktu tertentu menggunakan pendekatan unsupervised topic modeling.
-### Deskripsi Model LDA
-
-Model utama yang digunakan dalam proyek ini adalah **Latent Dirichlet Allocation (LDA)** yang merupakan metode *probabilistic topic modeling* berbasis unsupervised learning.
-
-- **Model**: LDA dari `scikit-learn` (`LatentDirichletAllocation`)
-- **Vectorizer**: CountVectorizer
-- **Pemilihan jumlah topik**: Otomatis berdasarkan nilai **coherence score (c_v)** menggunakan `gensim.models.CoherenceModel`
-- **Preprocessing**:
-  - Case folding (huruf kecil)
-  - Penghapusan angka, tanda baca
-  - Stopword removal (Sastrawi + custom list)
-  - Tokenisasi dan pembentukan n-gram (bigram & trigram)
-
-- **Visualisasi hasil**:
-  - Wordcloud per topik
-  - Perceptual map (PCA)
-  - Visualisasi interaktif via pyLDAvis
-
-## Output
-
-- Wordcloud per topik (tersimpan di folder `figures/wordclouds_per_topic/`)
-- Distribusi Topik (tersimpan sebagai `lda_topic_distribution.png`)
-- Visualisasi interaktif HTML (tersimpan sebagai `pyldavis_lda.html`)
-
-## Author
-
-Yayang Matira — A master's student in Computer Science at Universitas Gadjah Mada
+Yayang Matira | Mahasiswa Magister Ilmu Komputer | Universitas Gadjah Mada
