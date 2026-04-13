@@ -1,4 +1,4 @@
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 def vectorize_count(texts, max_features=1000):
     texts_joined = [' '.join(doc) for doc in texts]

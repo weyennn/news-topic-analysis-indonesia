@@ -8,6 +8,8 @@ def load_data(filepath):
 
 def clean_text(text):
     text = text.lower()
+    text = re.sub(r'&[a-z]+;', ' ', text)       # hapus HTML entities (&amp;, &nbsp;, dll)
+    text = re.sub(r'https?://\S+', '', text)     # hapus URL
     text = re.sub(r'\d+', '', text)
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = re.sub(r'\s+', ' ', text).strip()

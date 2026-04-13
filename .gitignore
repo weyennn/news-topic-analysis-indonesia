@@ -2,23 +2,28 @@
 env/
 lda_venv/
 .venv/
+
+# Python cache
 __pycache__/
 *.py[cod]
 *.so
 *.pyd
 *.pyo
 
-# VSCode / IDE config
+# Generated data (scraping output)
+data/data_berita_scraped.xlsx
+
+# IDE
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
 
-# System files
+# System
 .DS_Store
 Thumbs.db
 
-# Log dan cache
+# Logs & cache
 *.log
 *.tmp
 *.bak

@@ -1,125 +1,148 @@
-# Analisis Tren Topik Pemberitaan Nasional Berbasis Data Teks
+# Analisis Topik Pemberitaan Nasional Indonesia
 
-## Latar Belakang Masalah
-Pemberitaan media daring menghasilkan data teks dalam jumlah besar
-yang sulit dianalisis secara manual. Tanpa analisis terstruktur,
-pola isu dominan dan perubahan topik dalam periode tertentu
-sering kali tidak teridentifikasi secara sistematis.
+> Topic modeling berbasis **LDA** pada ~2.000 judul berita dari 7 media online Indonesia.
+> Mengidentifikasi isu-isu dominan secara otomatis dari data teks terbaru melalui RSS feed.
 
-Proyek ini bertujuan untuk menganalisis tren topik pada judul berita
-berbahasa Indonesia menggunakan pendekatan *topic modeling*,
-guna memperoleh insight mengenai isu-isu utama yang muncul
-dalam periode waktu tertentu.
+---
+
+## Latar Belakang
+
+Media daring Indonesia memproduksi ribuan judul berita setiap harinya. Tanpa pendekatan terstruktur,
+sulit untuk menangkap gambaran besar — isu apa yang sedang dominan, dan bagaimana pola topik terbentuk
+lintas sumber media.
+
+Proyek ini membangun pipeline end-to-end: mulai dari **scraping otomatis** RSS feed, **preprocessing**
+teks berbahasa Indonesia, hingga **topic modeling** dengan LDA — lengkap dengan visualisasi interaktif.
+
+---
+
+## Hasil
+
+Model menemukan **7 topik** optimal (coherence score c_v = **0.5092**) dari 2.079 judul berita:
+
+| Topik | Kata Kunci Dominan | Interpretasi |
+|---|---|---|
+| 1 | makanan, tiket, diskon, usia, industri | Gaya Hidup & Konsumen |
+| 2 | china, bank, jepang, bi, pasar, ai | Ekonomi Global & Teknologi |
+| 3 | iran, listrik, mbg, militer, arab | Geopolitik & Energi |
+| 4 | harga, arsenal, man_city, belanja, selat_hormuz | Olahraga & Pasar |
+| 5 | prabowo, trump, putin, perang, israel, kpk, mk | Politik & Konflik Internasional |
+| 6 | bisnis, beras, dana, uang, lebaran | Ekonomi Domestik |
+| 7 | emas, investasi, ihsg, makan, murah | Pasar Modal & Investasi |
+
+Jumlah topik dipilih secara objektif berdasarkan **coherence score tertinggi** pada rentang 4–12 topik.
 
 ---
 
 ## Data
-- **Sumber:** Judul berita dari kanal **detikNews**
-- **Rentang waktu:** 16 Desember 2021 – 24 Maret 2022
-- **Jumlah data:** 1.980 judul berita
-- **Format:** Excel (`.xlsx`)
-- **Variabel utama:** `title` (judul berita)
 
-Data ini merepresentasikan kecenderungan isu nasional
-yang muncul dalam pemberitaan media daring.
+Dikumpulkan otomatis via **36 RSS feed** dari 7 media nasional:
 
----
+| Sumber | Kategori |
+|---|---|
+| Detik | News, Finance, Inet, Health, Hot, Sport, Travel, Food, Oto, Wolipop |
+| CNBC Indonesia | Umum, Market, News, Lifestyle, Entrepreneur |
+| Antara News | Terkini, Politik, Hukum, Ekonomi, Olahraga, Humaniora, Lifestyle, Hiburan |
+| Tempo | Nasional, Bisnis, Hukum, Dunia |
+| Sindonews | Nasional, Ekbis, Internasional, Otomotif |
+| CNN Indonesia | Semua Kategori |
+| Republika | Umum, Nasional, Ekonomi, Politik |
 
-## Pendekatan Analisis
-
-### 1. Pra-pemrosesan Teks
-- Case folding
-- Penghapusan angka dan tanda baca
-- Stopword removal (Sastrawi + daftar khusus)
-- Tokenisasi dan pembentukan n-gram (bigram & trigram)
-
-Tahap ini bertujuan untuk meningkatkan kualitas representasi teks
-sebelum dilakukan pemodelan topik.
-
-### 2. Pembentukan Representasi Dokumen
-- Vectorisasi teks menggunakan **CountVectorizer**
-- Pembentukan dokumen–term matrix sebagai input model
-
-### 3. Topic Modeling
-- Penerapan **Latent Dirichlet Allocation (LDA)**
-  untuk mengidentifikasi kelompok topik laten
-- Pemilihan jumlah topik optimal berdasarkan
-  **coherence score (c_v)**
-
-### 4. Visualisasi dan Interpretasi
-- Wordcloud untuk interpretasi kata kunci tiap topik
-- Perceptual map (PCA 2D) untuk melihat kedekatan antar topik
-- Visualisasi interaktif menggunakan **pyLDAvis**
+**~2.000 judul unik** per fetch · kolom: `title`, `source`, `published`, `link`
 
 ---
 
-## Hasil Analisis
-- Model berhasil mengelompokkan judul berita ke dalam
-  beberapa topik utama yang merepresentasikan isu nasional.
-- Setiap topik ditandai oleh kumpulan kata kunci dominan
-  yang memudahkan interpretasi konteks pemberitaan.
-- Visualisasi PCA menunjukkan pemisahan topik yang cukup jelas,
-  menandakan konsistensi struktur topik dalam data.
+## Pipeline
 
----
+```
+RSS Feeds → Scraping → Preprocessing → N-gram → Vectorization → LDA → Visualization
+```
 
-## Insight Utama
-- Pemberitaan nasional menunjukkan konsentrasi pada
-  beberapa isu utama yang muncul secara konsisten
-  dalam periode pengamatan.
-- Analisis topik membantu mereduksi kompleksitas data teks
-  menjadi ringkasan isu yang mudah dipahami.
-- Pendekatan ini dapat digunakan sebagai dasar
-  pemantauan tren menunjukkan fokus media
-  terhadap isu tertentu.
+### 1. Scraping (`src/scraper.py`)
+- Fetch via `requests` + `feedparser` dengan proper User-Agent
+- Deduplication otomatis berdasarkan judul
+- 36 feed dari 7 sumber, ~2.000 artikel per eksekusi
 
----
+### 2. Preprocessing (`src/preprocessing.py`)
+- Case folding, hapus angka, tanda baca, HTML entities, URL
+- Stopword removal: **Sastrawi** + custom list (~450 kata) mencakup kata fungsi, nama wilayah, nama media, kata framing artikel
 
-## Potensi Pemanfaatan
-- **Analisis Media:**  
-  Mengidentifikasi isu dominan dan pola framing media daring.
-- **Pemantauan Isu Publik:**  
-  Mendukung analisis tren kebijakan, politik, atau sosial
-  berbasis data teks.
-- **Data-driven Reporting:**  
-  Sebagai dasar pembuatan laporan ringkasan isu secara otomatis.
+### 3. N-gram (`src/n_gram.py`)
+- Bigram & trigram via **Gensim Phrases**
+- Menangkap frasa seperti `selat_hormuz`, `man_city`, `blokade_selat_hormuz`
+
+### 4. Vektorisasi (`src/vectorizer.py`)
+- **CountVectorizer** — `max_features=1000`, `min_df=2`, `max_df=0.95`
+
+### 5. Topic Modeling (`src/lda_model.py`)
+- **LDA (sklearn)** dengan `random_state=42`
+- Evaluasi coherence score (c_v) pada rentang 4–12 topik
+- Model terbaik dipilih otomatis berdasarkan skor tertinggi
+
+### 6. Visualisasi (`src/visualization.py`)
+- Coherence score plot (justifikasi pemilihan jumlah topik)
+- Wordcloud per topik
+- Distribusi topik (bar chart)
+- Peta topik 2D (PCA)
+- Visualisasi interaktif pyLDAvis
 
 ---
 
 ## Visualisasi
-- Wordcloud per topik tersedia pada:
-  `figures/wordclouds_per_topic/`
-- Distribusi topik:
-  `figures/lda_topic_distribution.png`
-- Visualisasi interaktif:
-  `figures/pyldavis_lda.html`
+
+| File | Keterangan |
+|---|---|
+| `figures/coherence_scores.png` | Kurva coherence score vs jumlah topik (4–12) |
+| `figures/lda_topic_distribution.png` | Distribusi skor tiap topik |
+| `figures/topic_pca.png` | Peta kedekatan antar topik (PCA 2D) |
+| `figures/wordclouds_per_topic/` | Wordcloud kata kunci per topik |
+| `figures/pyldavis_lda.html` | Visualisasi interaktif — buka di browser |
 
 ---
 
-## Tools & Library
-- Python, Pandas
-- Scikit-learn
-- Gensim
-- Sastrawi
-- WordCloud
-- Matplotlib
-- pyLDAvis
+## Cara Menjalankan
+
+**1. Clone & setup**
+```bash
+git clone https://github.com/<username>/news-topic-analysis-indonesia.git
+cd news-topic-analysis-indonesia
+python -m venv .venv
+source .venv/bin/activate      # Mac/Linux
+.venv\Scripts\activate         # Windows
+pip install -r requirements.txt
+```
+
+**2. Scrape data terbaru lalu analisis**
+```bash
+python main.py --scrape
+```
+
+**3. Atau gunakan data yang sudah ada**
+```bash
+python main.py --data data/data_berita_cleaned.xlsx
+```
+
+Output tersimpan di `figures/`.
 
 ---
 
 ## Struktur Proyek
+
 ```
-lda-berita/
+news-topic-analysis-indonesia/
 ├── data/
-│   ├── data_berita_cleaned.xlsx
-│   └── stopwords.txt
+│   ├── data_berita_cleaned.xlsx   # Dataset awal (detikNews, Des 2021–Mar 2022)
+│   └── stopwords.txt              # Custom stopword Bahasa Indonesia (~450 kata)
 ├── figures/
+│   ├── coherence_scores.png
 │   ├── lda_topic_distribution.png
+│   ├── topic_pca.png
 │   ├── pyldavis_lda.html
 │   └── wordclouds_per_topic/
 ├── src/
+│   ├── scraper.py
 │   ├── preprocessing.py
-│   ├── ngram.py
+│   ├── n_gram.py
 │   ├── vectorizer.py
 │   ├── lda_model.py
 │   └── visualization.py
@@ -127,6 +150,22 @@ lda-berita/
 └── requirements.txt
 ```
 
+> `data/data_berita_scraped.xlsx` di-generate saat `--scrape` dan tidak di-commit ke repo.
+
+---
+
+## Stack
+
+| Kategori | Library |
+|---|---|
+| Scraping | `requests`, `feedparser` |
+| NLP | `Sastrawi`, `Gensim` |
+| Modeling | `scikit-learn` (LDA, PCA, CountVectorizer) |
+| Visualisasi | `matplotlib`, `wordcloud`, `pyLDAvis` |
+| Data | `pandas`, `openpyxl` |
+
+---
+
 ## Penulis
 
-Yayang Matira | Mahasiswa Magister Ilmu Komputer | Universitas Gadjah Mada
+**Yayang Matira** · Mahasiswa Magister Ilmu Komputer · Universitas Gadjah Mada

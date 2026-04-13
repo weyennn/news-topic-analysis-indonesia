@@ -25,7 +25,3 @@ def compute_coherence_values(texts, vectorizer, doc_term_matrix, start=2, limit=
 
     return model_list, coherence_values
 
-def train_lda_model(doc_term_matrix, n_topics=5):
-    lda = LatentDirichletAllocation(n_components=n_topics, random_state=42)
-    lda.fit(doc_term_matrix)
-    return lda
